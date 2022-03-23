@@ -31,6 +31,23 @@ class EntropyBase(object):
         split = mask.split(' ')
         return split
 
+    def template_to_mask(self, template : str) -> str:
+        '''Converts a hashcat template to one for Entro.py'''
+        mask = []
+        template = template.split('?')[1:]
+        for t in template: 
+            if t == 'u':
+                mask.append('upper')
+            elif t == 'l':
+                mask.append('lower')
+            elif t == 'd':
+                mask.append('digit')
+            elif t == 's':
+                mask.append('punc')
+            else:
+                mask.append('anyc')
+        return ' '.join(mask)
+
     def hashes_to_str(self, rate : int) -> str:
         '''Converts the raw hash rate to a more readable string in Mh/s'''
         return str(int(rate/1000000))
@@ -130,7 +147,7 @@ class EntropyAnalyzer(EntropyBase):
         '''Determines the count of each part of speech in the dictionary'''
         if sdict is None:
             sdict = self.dict
-        pos_count = {'noun': 0, 'verb': 0, 'adverb': 0, 'adjective': 0, 'pronoun': 0, 'conjunction': 0, 'preposition': 0, 'interjection': 0, 'punc' : 0, 'digit' : 0, 'lower': 0, 'upper' : 0, 'letter': 0}
+        pos_count = {'noun': 0, 'verb': 0, 'adverb': 0, 'adjective': 0, 'pronoun': 0, 'conjunction': 0, 'preposition': 0, 'interjection': 0, 'anyc': 0, 'punc' : 0, 'digit' : 0, 'lower': 0, 'upper' : 0, 'letter': 0}
         for key in list(sdict.items()):
             for pos in self.get_pos(key[0]):
                 if pos in pos_count:
@@ -148,7 +165,7 @@ class EntropyAnalyzer(EntropyBase):
         return super(EntropyAnalyzer, self).calculate_security(possibilities)
 
     def get_all_pos(self, pos) -> List[str]:
-        '''Returns a list of all the words in the dictionary that are the passes psrt-of-speech'''
+        '''Returns a list of all the words in the dictionary that are the passed part-of-speech'''
         poses : List[str] = []
         for w in list(self.dict.items()):
             w = w[0]
@@ -165,9 +182,11 @@ class EntropyAnalyzer(EntropyBase):
     def add_chars(self) -> None:
         pp = PasswordPattern()
         for typ in pp.memoize.keys():
-            if typ == 'any' or typ == 'letter':
+            if typ == 'letter':
                 continue
-            pos = [typ]
+            if typ == 'any':
+                continue
+            pos = [typ, 'anyc']
             if typ == 'lower' or typ == 'upper':
                 pos.append('letter')
             for c in pp.memoize[typ]:
