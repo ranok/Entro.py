@@ -131,7 +131,7 @@ class EntropyAnalyzer(EntropyBase):
             poses.add(defi['part_of_speech'])
         return list(poses)
 
-    def filter_dict(self, filter_func : Callable[[str], bool], cull : bool = False) -> Union[None, Dict]:
+    def filter_dict(self, filter_func : Callable[[str], bool], cull : bool = True) -> Union[None, Dict]:
         '''Filters the dictionary based on passed filtering function on the word'''
         fdict = dict()
         for key, val in list(self.dict.items()):
