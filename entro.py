@@ -65,6 +65,7 @@ class EntropyBase(object):
         try:
             start : float = time.time()
             crack_count : int = 0
+            iters : int = 0
             mask : List[str] = self.parse_mask(pos_mask)
             lol = []
             for pos in mask:
@@ -73,8 +74,10 @@ class EntropyBase(object):
                 lol.append(self.memoize[pos])
             for perm in itertools.product(*lol):
                 if timeout != 0 and (time.time() - start) >= timeout:
+                    print("Timeout reached, attempted {0} guesses in {1} seconds".format(str(iters), str(timeout)))
                     return crack_count
                 teststr = ''.join(map(str, perm))
+                iters += 1
                 if type(sha1sum) is set:
                     if hashlib.sha1(teststr.encode('utf-8')).hexdigest() in sha1sum:
                         crack_count += 1
