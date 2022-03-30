@@ -74,7 +74,7 @@ class EntropyBase(object):
                 lol.append(self.memoize[pos])
             for perm in itertools.product(*lol):
                 if timeout != 0 and (time.time() - start) >= timeout:
-                    print("Timeout reached, attempted {0} guesses in {1} seconds ({2} H/s)".format(str(iters), str(timeout), str(iters/timeout))
+                    print("Timeout reached, attempted {0} guesses in {1} seconds ({2} kH/s)".format(str(iters), str(timeout), str(iters/timeout/1000)))
                     return crack_count
                 teststr = ''.join(map(str, perm))
                 iters += 1
