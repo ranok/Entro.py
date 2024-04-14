@@ -21,6 +21,7 @@ class EntropyBase(object):
     def __init__(self):
         self.memoize : Dict = dict()
         self.dict : Dict = dict()
+        self.cracks : int = 0
 
     def poss_to_bits(self, poss) -> float:
         '''Converts a number of possibilities to approx. bits of entropy'''
@@ -81,9 +82,12 @@ class EntropyBase(object):
                 if type(sha1sum) is set:
                     if hashlib.sha1(teststr.encode('utf-8')).hexdigest() in sha1sum:
                         crack_count += 1
+                        self.cracks += 1
+                        sha1sum = sha1sum - {hashlib.sha1(teststr.encode('utf-8')).hexdigest()}
                 else:
                     if sha1sum == hashlib.sha1(teststr.encode('utf-8')).hexdigest():
                         crack_count += 1
+                        self.cracks += 1
                         if timef:
                             print("Took %d seconds to crack\n" % (time.time() - start))
                         return teststr
@@ -215,3 +219,7 @@ class PasswordPattern(EntropyBase):
         for e in mask:
             possibilities *= len(self.memoize[e])
         return super(PasswordPattern, self).calculate_security(possibilities)
+
+def hash_str(s : str) -> str:
+    '''SHA1 hashes a string'''
+    return hashlib.sha1(s.encode()).hexdigest()
